@@ -4,30 +4,26 @@ from wider import WIDER
 import cv2
 import matplotlib.pyplot as plt
 from PIL import Image
-
-# f = open(r'D:\dataset\wider face\wider_face_split\wider_face_split\wider_face_train_bbx_gt.txt', 'r')
-# lines = f.readlines()
-
+from tools import utils
 
 wider = WIDER('D:\dataset\wider_face\wider_face_split\wider_face_split',
               'D:\dataset\wider_face\WIDER_train\WIDER_train\images',
               'wider_face_train.mat')
-# img_crop = 'img'
 
-if not os.path.exists('label.txt'):
-    with open('label.txt', 'w') as f:
-        for i, data in enumerate(wider.next()):
-            boxes = []
-            name = data.image_name
-            f.write(str(name) + " ")
-            for bbox in data.bboxes:
-                x1 = bbox[0]
-                x2 = bbox[1]
-                w = bbox[2]
-                h = bbox[3]
-
-                f.write(str(x1) + " " + str(x2) + " " + str(w) + " " + str(h) + " ")
-            f.write("\n")
+# if not os.path.exists('label.txt'):
+#     with open('label.txt', 'w') as f:
+#         for i, data in enumerate(wider.next()):
+#             boxes = []
+#             name = data.image_name
+#             f.write(str(name) + " ")
+#             for bbox in data.bboxes:
+#                 x1 = bbox[0]
+#                 x2 = bbox[1]
+#                 w = bbox[2]
+#                 h = bbox[3]
+#
+#                 f.write(str(x1) + " " + str(x2) + " " + str(w) + " " + str(h) + " ")
+#             f.write("\n")
 
 save_path = r'F:\widerface'
 
@@ -69,25 +65,23 @@ with open('label.txt', 'r') as f:
                 w = x2 - x1
                 h = y2 - y1
 
+                if w < 40 or h < 40:
+                    break
+
                 cx = (x1 + x2) / 2
                 cy = (y1 + y2) / 2
 
                 box = np.array([x1, y1, x2, y2])
-
-                for i in range(5):
-                    mw = np.random.randint(-w * 0.1, w * 0.1)
-                    mh = np.random.randint(-w * 0.1, w * 0.1)
-
-                    cx_ = cx + mw
-                    cy_ = cy + mh
-
-                    offset_
-
-                    with Image.open(img_name) as img:
-                        # img.show()
+                with Image.open(img_name) as img:
+                    for i in range(5):
+                        mw = np.random.randint(-w * 0.2, w * 0.2)
+                        mh = np.random.randint(-w * 0.2, w * 0.2)
+                        cx_ = cx + mw
+                        cy_ = cy + mh
                         img_crop = img.crop(box)
+                        # img_crop.show()
                         img_crop = img_crop.resize((face_size, face_size))
-                        img_crop.save('{}/{}/positive/{}.{}.{}.{}'.format(save_path, face_size, x1, y1, x2, y2))
+                        img_crop.save('{}/{}/positive/{}.{}.{}.{}.jpg'.format(save_path, face_size, x1, y1, x2, y2))
 
 # for i, data in enumerate(wider.next()):
 #     boxes = []

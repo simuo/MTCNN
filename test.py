@@ -1,97 +1,51 @@
-import torch.nn as nn
+import cv2
 
 
-class PNet(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.prelayer = nn.Sequential(
-            nn.Conv2d(3, 10, 3, 1),  # conv1
-            nn.PReLU(10),
-            nn.MaxPool2d(2, 2, ceil_mode=True),  # pool
-            nn.Conv2d(10, 16, 3, 1),  # conv2
-            nn.PReLU(16),
-            nn.Conv2d(16, 32, 3, 1),  # conv3
-            nn.PReLU(32)
-        )
-
-        self.conv4_1 = nn.Conv2d(32, 1, 1, 1)  # conv4
-        self.conv4_2 = nn.Conv2d(32, 4, 1, 1)  # conv5
-
-    def forward(self, x):
-        output = self.prelayer(x)
-        # confidence = nn.functional.sigmoid(self.conv4_1(output))
-        confidence = self.conv4_1(output).sigmoid()
-        offset = self.conv4_2(output)
-
-        return confidence, offset
-
-
-class RNet(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.pre_layer = nn.Sequential(
-            nn.Conv2d(3, 28, 3, 1),  # conv1
-            nn.PReLU(28),
-            nn.MaxPool2d(3, 2, ceil_mode=True),  # pool
-            nn.Conv2d(28, 48, 3, 1),  # conv2
-            nn.PReLU(48),
-            nn.MaxPool2d(3, 2, ceil_mode=True),  # pool2
-            nn.Conv2d(48, 64, 2, 2),  # conv3
-            nn.PReLU(64)
-            # nn.Linear(576, 128),
-            # nn.PReLU(128)
-        )
-        self.conv4 = nn.Linear(64 * 2 * 2, 128)
-        self.prelu4 = nn.PReLU()
-
-        self.conv5_1 = nn.Linear(128, 1)
-        self.conv5_2 = nn.Linear(128, 4)
-
-    def forward(self, x):
-        output = self.pre_layer(x)
-        # print("1", output.shape)
-        output = output.view(output.size(0), -1)
-        # print('2', output.shape)
-        output = self.conv4(output)
-        output = self.prelu4(output)
-
-        # label = nn.functional.sigmoid(self.conv5_1(output))
-        label = self.conv5_1(output).sigmoid()
-        offset = self.conv5_2(output)
-
-        return label, offset
+# def detect_video(self, video_path):
+#     cap = cv2.VideoCapture(video_path)
+#     while (cap.isOpened()):
+#         # Capture frame-by-frame
+#         ret, frame = cap.read()
+#         # pnet_boxes = self.__pnet_detect(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+#         # rnet_boxes = self.__rnet_detect(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), pnet_boxes)
+#         # onet_boxes = self.__onet_detect(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), rnet_boxes)
+#         # if onet_boxes is None:
+#         #     cv2.imshow('Video', frame)
+#         #     if cv2.waitKey(25) & 0xFF == ord('q'):
+#         #         break
+#         #     continue
+#         # # Detected_image = self.draw(frame, onet_boxes)
+#         # for i, box in enumerate(onet_boxes):
+#         #     x1 = int(box[0])
+#         #     y1 = int(box[1])
+#         #     x2 = int(box[2])
+#         #     y2 = int(box[3])
+#         #     font = cv2.FONT_HERSHEY_COMPLEX
+#         #     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), thickness=1)
+#         #     cv2.putText(frame, str(box[4]), (x1, y1 - 8), font, 0.3, (255, 0, 0), 1)
+#         cv2.imshow('Video', frame)
+#         cv2.waitKey(1)
+#         if cv2.waitKey(40) & 0xFF == ord('q'):
+#             break
+#     # When everything done, release the capture
+#     cap.release()
+#     cv2.destroyAllWindows()
+#
+# detect_video(r"G:\CloudMusic\MV\testvi.mp4")
 
 
-class ONet(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.prelayer0 = nn.Sequential(
-            nn.Conv2d(3, 32, 3, 1),
-            nn.PReLU(32),
-            nn.MaxPool2d(3, 2, ceil_mode=True),
-            nn.Conv2d(32, 64, 3, 1),
-            nn.PReLU(64),
-            nn.MaxPool2d(3, 2, ceil_mode=True),
-            nn.Conv2d(64, 64, 3, 1),
-            nn.PReLU(64),
-            nn.MaxPool2d(2, 2, ceil_mode=True),
-            nn.Conv2d(64, 128, 2, 1),
-            nn.PReLU(128)
-        )
+import cv2
 
-        self.conv5 = nn.Linear(3 * 3 * 128, 256)
-        self.prelu5 = nn.PReLU()
+capture = cv2.VideoCapture(r"G:\CloudMusic\MV\videoplayback.mp4")
 
-        self.conv6_1 = nn.Linear(256, 1)
-        self.conv6_2 = nn.Linear(256, 4)
-
-    def forward(self, x):
-        output = self.prelayer0(x)
-        output = output.view(x.size(0), -1)
-        output = self.conv5(output)
-        output = self.prelu5(output)
-
-        label = self.conv6_1(output).sigmoid()
-        offset = self.conv6_2(output)
-
-        return label, offset
+if capture.isOpened():
+    while True:
+        ret, prev = capture.read()
+        if ret == True:
+            cv2.imshow('video', prev)
+        else:
+            break
+        print(cv2.waitKey(20))
+        if cv2.waitKey(40) == 27:
+            break
+cv2.destroyAllWindows()

@@ -5,12 +5,8 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from src.MtcnnTrain import trainer
-from src.MtcnnNet import ONet
-import cfg
+from src.myNet import O48Net
 
 if __name__ == '__main__':
-    # trainer = trainer(ONet(), '../models/onet.pth', r'F:\MTCNN\celeba3\48', '../log/Olog.txt')
-    trainer = trainer(ONet(), '../models/onet.pth', r'F:\celeba3\48', '../log/Olog.txt')
-
-    # trainer = trainer(ONet(), cfg.Omodelpath, cfg.Odata, cfg.Olog)
+    trainer = trainer(O48Net(), '../models/onet.pth', r'F:\celeba3\48', '../log/Olog.txt')
     trainer.train()

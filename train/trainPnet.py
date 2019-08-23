@@ -5,11 +5,8 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from src.MtcnnTrain import trainer
-from src.MtcnnNet import PNet
-import cfg
+from src.myNet import P12Net
 
 if __name__ == '__main__':
-    # trainer = trainer(PNet(), '../models/pnet.pth', r'F:\MTCNN\celeba3\12', '../log/Plog.txt')
-    trainer = trainer(PNet(), '../models/pnet.pth', r'F:\celeba3\12', '../log/Plog.txt')
-    # trainer = trainer(PNet(), cfg.Pmodelpath, cfg.Pdata, cfg.Plog)
+    trainer = trainer(P12Net(), '../models/pnet.pth', r'F:\celeba3\12', '../log/Plog.txt')
     trainer.train()

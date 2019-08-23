@@ -1,8 +1,7 @@
 import numpy as np
-import cython
-import time
+import numba
 
-
+@numba.jit(nopython=True)
 def iou(box, boxes, isMin=False):  # [x1,y1,x2,y2,c]
     # 计算面积
     box_area = (box[2] - box[0]) * (box[3] - box[1])
@@ -26,9 +25,7 @@ def iou(box, boxes, isMin=False):  # [x1,y1,x2,y2,c]
 
     return over
 
-
 def nms(boxes, threshold=0.3, isMin=False):
-    tt = time.process_time()
     # 根据置信度进行排序
     _boxes = boxes[(-boxes[:, 4]).argsort()]
     # 保留剩余的框
@@ -45,14 +42,11 @@ def nms(boxes, threshold=0.3, isMin=False):
         _boxes = b_boxes[index]
     if _boxes.shape[0] > 0:
         r_boxes.append(_boxes[0])
-    ee = time.process_time()
-    print('nmsTime:', ee - tt)
     # 将array组装成矩阵
     try:
         return np.stack(r_boxes)
     except Exception as e:
         print(str(e))
-
 
 def convert_to_square(bbox):
     square_bbox = bbox.copy()
@@ -68,7 +62,6 @@ def convert_to_square(bbox):
 
     return square_bbox
 
-
 def prewhiten(x):
     mean = np.mean(x)
     std = np.std(x)
@@ -76,24 +69,8 @@ def prewhiten(x):
     y = np.multiply(np.subtract(x, mean), 1 / std_adj)
     return y
 
-
 # if __name__ == '__main__':
 #     bs = np.array([[2,2,30,30,40],[3,3,23,23,60],[18,18,27,27,15]])
 #     print(nms(bs))
 
 
-def __box(self, start_index, offset, cls, scale, stride=2, side_len=12):
-    _x1 = (start_index[1] * stride).item() / scale
-    _y1 = (start_index[0] * stride).item() / scale
-    _x2 = (start_index[1] * stride + side_len).item() / scale
-    _y2 = (start_index[0] * stride + side_len).item() / scale
-
-    ow = _x2 - _x1
-    oh = _y2 - _y1
-
-    _offset = offset[start_index[0], start_index[1]]
-    x1 = _x1 + ow * _offset[0]
-    y1 = _y1 + oh * _offset[1]
-    x2 = _x2 + ow * _offset[2]
-    y2 = _y2 + oh * _offset[3]
-    return [x1, y1, x2, y2, cls]

@@ -1,7 +1,7 @@
 import os
 import cv2
 import torch
-import src.MtcnnNet as Net
+import src.originNet as Net
 import PIL.Image as Image
 import torchvision.transforms as tf
 
